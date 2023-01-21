@@ -1,0 +1,25 @@
+
+.calendar-container {
+  display: inline-block;
+  margin: auto;
+  width: 60%;
+  /* height: 100px; */
+  border: 3px solid black;
+  padding: 10px;
+}
+
+.calendar-page {
+  display: flex;
+  align-items: flex-start;
+}
+
+.input-box {
+  /* display: inline;
+  margin-left: 200px;
+  height: 200px;
+  background-color: aqua; */
+    /* align-content: space-between; */
+  /* height: 1500px; */
+  /* height: auto; */
+}
+
