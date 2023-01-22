@@ -10,6 +10,8 @@
     "@fullcalendar/daygrid": "^6.0.3",
     "@fullcalendar/react": "^6.0.4",
     "@fullcalendar/timegrid": "^6.0.3",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.5",
     "@mui/x-date-pickers": "^5.0.15",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

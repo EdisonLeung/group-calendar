@@ -3,19 +3,20 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { createEvent } from "@testing-library/react";
-import { API } from "aws-amplify";
+import { API, Auth } from "aws-amplify";
 import { listEvents } from "../graphql/queries";
 import {
   createEvent as createEventMutation,
   deleteEvent as deleteEventMutation,
 } from "../graphql/mutations";
-
+import { CognitoIdentityProviderClient, ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { Button, Flex, Text, View } from "@aws-amplify/ui-react";
 
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers";
+import Sidenav from "./Sidebar";
 
 const WEEK_DAYS = [
   "Sunday",
@@ -27,18 +28,9 @@ const WEEK_DAYS = [
   "Saturday",
 ];
 
+const COLORS = ["#86C6EE", "#C3D888", "#FDD0C7", "#FFDAC1", "#B5EAD7", "#C7CEEA", "#F9AE48"]
 function CalendarPage() {
-  const [events, setEvents] = useState([
-    // { title: "event now", date: new Date(), color: "purple" },
-    // {
-    //   groupId: "999",
-    //   title: "Repeating Event",
-    //   startTime: "7:00",
-    //   endTime: "9:15",
-    //   startRecur: new Date(),
-    //   daysOfWeek: [1, 2, 4, 0],
-    // },
-  ]);
+  const [events, setEvents] = useState([]);
 
   const [repeatDays, setRepeatDays] = useState([]);
   const [allDay, setAllDay] = useState(false);
@@ -48,7 +40,13 @@ function CalendarPage() {
   const [endDateTime, setEndDateTime] = useState(new Date());
 
   const calendar_name = "Your Schedule";
-
+  const user_to_color = {}
+  function getOtherUserColor(username) {
+    if (!(username in user_to_color)) {
+      user_to_color[username] = COLORS[Object.keys(user_to_color).length + 1]
+    }
+    return user_to_color[username]
+  }
   function handleRepeatClick(day) {
     let rval = [...repeatDays];
     if (repeatDays.indexOf(day) === -1) {
@@ -60,30 +58,45 @@ function CalendarPage() {
   }
 
   async function organizeEvents(events) {
-    const rval = []
+    const rval = [];
+    const user = await Auth.currentUserInfo();
+    
     events.map((event) => {
+      const event_title = event.owner + " (" + event.title +")"
+      const event_color = event.owner === user.username ? COLORS[0] : getOtherUserColor(event.owner)
       if (event.repeat) {
+        console.log(event)
         rval.push({
           groupId: event.id,
-          title: event.title,
-          startTime: new Date(event.startTime).getHours() + ":" + new Date(event.startTime).getMinutes(),
-          endTime: new Date(event.endTime).getHours() + ":" + new Date(event.endTime).getMinutes(),
+          title: event_title,
+          startTime:
+            new Date(event.startTime).getHours() +
+            ":" +
+            new Date(event.startTime).getMinutes(),
+          endTime:
+            new Date(event.endTime).getHours() +
+            ":" +
+            new Date(event.endTime).getMinutes(),
           startRecur: new Date(),
-          daysOfWeek: event.daysOfWeek,  
-          id: event.id      
-        })
+          daysOfWeek: event.daysOfWeek,
+          id: event.id,
+          color: event_color,
+        });
       } else {
         rval.push({
-         title: event.title, start: new Date(event.startTime), end: new Date(event.endTime), id: event.id
-        })
+          title: event_title,
+          start: new Date(event.startTime),
+          end: new Date(event.endTime),
+          id: event.id,
+          color: event_color,
+        });
       }
-    })
-    setEvents(rval)
+    });
+    setEvents(rval);
   }
   async function fetchEvents() {
     const apiData = await API.graphql({ query: listEvents });
     const eventsFromAPI = apiData.data.listEvents.items;
-    console.log(eventsFromAPI)
     organizeEvents(eventsFromAPI);
   }
 
@@ -94,7 +107,7 @@ function CalendarPage() {
       endTime: endDateTime,
       repeat: repeat,
       allDay: allDay,
-      daysOfWeek: repeatDays
+      daysOfWeek: repeatDays,
     };
     await API.graphql({
       query: createEventMutation,
@@ -123,7 +136,7 @@ function CalendarPage() {
           <input
             type="text"
             class="bg-gray-50 outline m-5"
-            placeholder="Event"
+            placeholder="Event Name"
             required
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -177,6 +190,7 @@ function CalendarPage() {
                       <input
                         type="checkbox"
                         id={WEEK_DAYS.indexOf(day)}
+                        key={WEEK_DAYS.indexOf(day)}
                         value=""
                         class="hidden peer"
                         required=""
@@ -213,7 +227,7 @@ function CalendarPage() {
         </div>
         <div class="col-span-5 h-auto mr-3 outline">
           <FullCalendar
-            aspectRatio={2}
+            aspectRatio={2.5}
             handleWindowResize
             initialView="timeGridWeek"
             scrollTime={"08:00:00"}
@@ -241,7 +255,7 @@ function CalendarPage() {
             </Text>
             <Text as="span">{note.title}</Text>
             <Button variation="link" onClick={() => deleteEvent(note)}>
-              Delete note
+              Delete Event
             </Button>
           </Flex>
         ))}
