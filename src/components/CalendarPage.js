@@ -1,8 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { createEvent } from "@testing-library/react";
+import { API } from "aws-amplify";
+import { listEvents } from "../graphql/queries";
+import {
+  createEvent as createEventMutation,
+  deleteEvent as deleteEventMutation,
+} from "../graphql/mutations";
+
+import { Button, Flex, Text, View } from "@aws-amplify/ui-react";
+
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers";
 
 const WEEK_DAYS = [
   "Sunday",
@@ -16,25 +29,25 @@ const WEEK_DAYS = [
 
 function CalendarPage() {
   const [events, setEvents] = useState([
-    { title: "event now", date: new Date(), color: "purple" },
-    {
-      groupId: "999",
-      title: "Repeating Event",
-      startTime: "7:00",
-      endTime: "9:15",
-      startRecur: new Date(),
-      daysOfWeek: [1, 2, 4, 0],
-    },
+    // { title: "event now", date: new Date(), color: "purple" },
+    // {
+    //   groupId: "999",
+    //   title: "Repeating Event",
+    //   startTime: "7:00",
+    //   endTime: "9:15",
+    //   startRecur: new Date(),
+    //   daysOfWeek: [1, 2, 4, 0],
+    // },
   ]);
 
   const [repeatDays, setRepeatDays] = useState([]);
+  const [allDay, setAllDay] = useState(false);
   const [repeat, setRepeat] = useState(false);
-  const [title, setTitle] = useState();
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
-  const [date, setDate] = useState();
+  const [title, setTitle] = useState("");
+  const [startDateTime, setStartDateTime] = useState(new Date());
+  const [endDateTime, setEndDateTime] = useState(new Date());
 
-  const calendar_name = "Silly Ass Bitches";
+  const calendar_name = "Your Schedule";
 
   function handleRepeatClick(day) {
     let rval = [...repeatDays];
@@ -46,44 +59,104 @@ function CalendarPage() {
     setRepeatDays(rval);
   }
 
-  function createEvent(){
-    if (repeat) {
-      setEvents([...events, {groupId: "6969", title: title, startTime: startTime, endTime: endTime, startRecur: new Date(), daysOfWeek: repeatDays}])
-    } else {
-      setEvents([...events, {title: title, date: new Date(date)}])
-    }
+  async function organizeEvents(events) {
+    const rval = []
+    events.map((event) => {
+      if (event.repeat) {
+        rval.push({
+          groupId: event.id,
+          title: event.title,
+          startTime: new Date(event.startTime).getHours() + ":" + new Date(event.startTime).getMinutes(),
+          endTime: new Date(event.endTime).getHours() + ":" + new Date(event.endTime).getMinutes(),
+          startRecur: new Date(),
+          daysOfWeek: event.daysOfWeek,  
+          id: event.id      
+        })
+      } else {
+        rval.push({
+         title: event.title, start: new Date(event.startTime), end: new Date(event.endTime), id: event.id
+        })
+      }
+    })
+    setEvents(rval)
   }
+  async function fetchEvents() {
+    const apiData = await API.graphql({ query: listEvents });
+    const eventsFromAPI = apiData.data.listEvents.items;
+    console.log(eventsFromAPI)
+    organizeEvents(eventsFromAPI);
+  }
+
+  async function createEvent() {
+    const data = {
+      title: title,
+      startTime: startDateTime,
+      endTime: endDateTime,
+      repeat: repeat,
+      allDay: allDay,
+      daysOfWeek: repeatDays
+    };
+    await API.graphql({
+      query: createEventMutation,
+      variables: { input: data },
+    });
+    fetchEvents();
+  }
+
+  async function deleteEvent({ id }) {
+    await API.graphql({
+      query: deleteEventMutation,
+      variables: { input: { id } },
+    });
+    fetchEvents();
+  }
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
   return (
     <div className="App">
       <h1 className="text-3xl mb-9">{calendar_name}</h1>
       <div class="grid grid-cols-6 gap-4">
         <div class="ml-3 outline flex flex-col">
-          <h1 class="text-3xl">Create Event {date}</h1>
+          <h1 class="text-3xl">Create Event</h1>
           <input
             type="text"
             class="bg-gray-50 outline m-5"
             placeholder="Event"
             required
-            onChange={(e)=>setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
           />
           <div class="outline m-2 flex flex-col">
+            <div class="m-2">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="Start Date/Time"
+                  value={startDateTime}
+                  onChange={(newValue) => {
+                    setStartDateTime(newValue.$d);
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
             <div>
               <input type="checkbox" id="repeat-checkbox" />
               <label for="repeat-checkbox" class="ml-2 text-sm">
                 All-day
               </label>
             </div>
-            <div>
-              Date:
-              <input type="date" class="bg-gray-50 outline" required onChange={(e)=>setDate(e.target.value)} />
-            </div>
-            <div>
-              Start Time:
-              <input type="time" class="bg-gray-50 outline" required onChange={(e)=>setStartTime(e.target.value)} />
-            </div>
-            <div>
-              End Time:{" "}
-              <input type="time" class="bg-gray-50 outline" required onChange={(e)=>setEndTime(e.target.value)}/>
+            <div class="m-2">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="End Date/Time"
+                  value={endDateTime}
+                  onChange={(newValue) => {
+                    setEndDateTime(newValue.$d);
+                  }}
+                />
+              </LocalizationProvider>
             </div>
             <div>
               <input
@@ -128,9 +201,9 @@ function CalendarPage() {
               <button
                 type="button"
                 class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center m-2"
-                onClick={()=>{
-                  alert("Event Created")
-                  createEvent()
+                onClick={() => {
+                  alert("Event Created");
+                  createEvent();
                 }}
               >
                 Create Event
@@ -143,7 +216,7 @@ function CalendarPage() {
             aspectRatio={2}
             handleWindowResize
             initialView="timeGridWeek"
-            scrollTime={"15:00:00"}
+            scrollTime={"08:00:00"}
             headerToolbar={{
               start: "title",
               center: "dayGridMonth,timeGridWeek,timeGridDay",
@@ -155,6 +228,24 @@ function CalendarPage() {
           />
         </div>
       </div>
+      <View margin="3rem 0">
+        {events.map((note) => (
+          <Flex
+            key={note.id || note.title}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text as="strong" fontWeight={700}>
+              {note.title}
+            </Text>
+            <Text as="span">{note.title}</Text>
+            <Button variation="link" onClick={() => deleteEvent(note)}>
+              Delete note
+            </Button>
+          </Flex>
+        ))}
+      </View>
     </div>
   );
 }

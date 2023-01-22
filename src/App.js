@@ -5,8 +5,6 @@ import "@aws-amplify/ui-react/styles.css";
 import {
   withAuthenticator,
   Button,
-  Heading,
-  Image,
   View,
   Card,
 } from "@aws-amplify/ui-react";
