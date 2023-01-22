@@ -9,7 +9,6 @@ import {
   createEvent as createEventMutation,
   deleteEvent as deleteEventMutation,
 } from "../graphql/mutations";
-import { CognitoIdentityProviderClient, ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { Button, Flex, Text, View } from "@aws-amplify/ui-react";
 
 import TextField from "@mui/material/TextField";
