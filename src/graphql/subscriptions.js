@@ -58,3 +58,81 @@ export const onDeleteEvent = /* GraphQL */ `
     }
   }
 `;
+export const onCreateGroup = /* GraphQL */ `
+  subscription OnCreateGroup(
+    $filter: ModelSubscriptionGroupFilterInput
+    $owner: String
+  ) {
+    onCreateGroup(filter: $filter, owner: $owner) {
+      id
+      title
+      events {
+        id
+        title
+        startTime
+        endTime
+        repeat
+        allDay
+        daysOfWeek
+        createdAt
+        updatedAt
+        owner
+      }
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onUpdateGroup = /* GraphQL */ `
+  subscription OnUpdateGroup(
+    $filter: ModelSubscriptionGroupFilterInput
+    $owner: String
+  ) {
+    onUpdateGroup(filter: $filter, owner: $owner) {
+      id
+      title
+      events {
+        id
+        title
+        startTime
+        endTime
+        repeat
+        allDay
+        daysOfWeek
+        createdAt
+        updatedAt
+        owner
+      }
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onDeleteGroup = /* GraphQL */ `
+  subscription OnDeleteGroup(
+    $filter: ModelSubscriptionGroupFilterInput
+    $owner: String
+  ) {
+    onDeleteGroup(filter: $filter, owner: $owner) {
+      id
+      title
+      events {
+        id
+        title
+        startTime
+        endTime
+        repeat
+        allDay
+        daysOfWeek
+        createdAt
+        updatedAt
+        owner
+      }
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
