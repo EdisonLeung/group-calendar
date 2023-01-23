@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import FormModal from "./FormModal";
+import JoinCalendarModal from "../Modals/JoinCalendarModal";
+import CreateCalendarGroup from "../Modals/CreateCalendarGroup";
 
 export default function Sidebar() {
   let menuArray = [true, false, false];
   const [menu, setMenu] = useState(menuArray);
   const [show, setShow] = useState(true);
-  const [showFormModal, setShowFormModal] = useState(false)
+  const [showJoinModal, setShowJoinModal] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const setMenuValue = (props) => {
     let newArr = [...menu];
@@ -26,12 +28,12 @@ export default function Sidebar() {
             <i class="fa fa-calendar"></i>
             <p className="text-base leading-4 ">My Calendar</p>
           </button>
-          <button className="flex jusitfy-start items-center space-x-6 w-full  focus:outline-none  hover:text-indigo-400  text-white rounded "  onClick={()=>setShowFormModal(true)}>
+          <button className="flex jusitfy-start items-center space-x-6 w-full  focus:outline-none  hover:text-indigo-400  text-white rounded "  onClick={()=>setShowJoinModal(true)}>
             <i class="fa fa-square-plus"></i>
 
             <p className="text-base leading-4 ">Join Calendar Group</p>
           </button>
-          <button className="flex jusitfy-start items-center space-x-6 w-full  focus:outline-none  hover:text-indigo-400  text-white rounded "  onClick={()=>setShowFormModal(true)}>
+          <button className="flex jusitfy-start items-center space-x-6 w-full  focus:outline-none  hover:text-indigo-400  text-white rounded "  onClick={()=>setShowCreateModal(true)}>
             <i class="fa fa-square-plus"></i>
 
             <p className="text-base leading-4 ">Create Calendar Group</p>
@@ -64,7 +66,8 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-      <FormModal open={showFormModal} onClose={()=>{setShowFormModal(false)}}/>
+      <JoinCalendarModal open={showJoinModal} onClose={()=>{setShowJoinModal(false)}}/>
+      <CreateCalendarGroup open={showCreateModal} onClose={()=>{setShowCreateModal(false)}}/>
     </div>
   );
 }

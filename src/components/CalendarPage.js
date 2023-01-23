@@ -14,7 +14,7 @@ import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import EventModal from "./EventModal";
+import EventModal from "../Modals/EventModal";
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -255,7 +255,7 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div class="col-span-5 h-auto mr-3 outline rounded-xl shadow-xl">
+        <div class="col-span-full h-auto mr-3 border-2 border-sky-500 rounded-xl shadow-xl">
           <FullCalendar
             aspectRatio={zoom}
             handleWindowResize
@@ -264,18 +264,18 @@ function CalendarPage() {
             displayEventTime={false}
             headerToolbar={{
               start: "title",
-              center: "dayGridMonth,timeGridWeek,timeGridDay",
-              end: "hideWeekend zoomIn zoomOut today prev,next",
+              center: "dayGridMonth,timeGridWeek,timeGridDay hideWeekend",
+              end: "zoomOut zoomIn today prev,next",
             }}
             customButtons={{
               zoomIn: {
-                text: "Shrink Height",
+                text: "(-) Height",
                 click: function () {
                   setZoom(zoom + 0.5);
                 },
               },
               zoomOut: {
-                text: "Increase Height",
+                text: "(+) Height",
                 click: function () {
                   setZoom(zoom - 0.5);
                 },
