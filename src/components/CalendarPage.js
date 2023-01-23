@@ -145,7 +145,7 @@ function CalendarPage() {
     <div className="App">
       <h1 className="text-3xl mb-9">{calendar_name}</h1>
       <div class="grid grid-cols-6 gap-4">
-        <div class="ml-3 outline flex flex-col">
+        <div class="ml-3 outline rounded flex flex-col">
           <h1 class="text-3xl">Create Event</h1>
           <input
             type="text"

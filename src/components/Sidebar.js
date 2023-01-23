@@ -16,10 +16,21 @@ export default function Sidebar() {
     return (
         <div class="absolute z-10 top-16 h-full">
             <div id="Main" className={`${show ? 'translate-x-0' : '-translate-x-full'} xl:rounded-r transform  xl:translate-x-0  ease-in-out transition duration-500 flex justify-start items-start h-full  w-full sm:w-64 bg-gray-900 flex-col`}>
+            <div className="mt-6 flex flex-col justify-start items-center  pl-4 w-full border-gray-600 border-b space-y-3 pb-5 ">
+                    <button className="flex jusitfy-start items-center space-x-6 w-full  focus:outline-none  focus:text-indigo-400  text-white rounded ">
+                        <i class="fa fa-calendar"></i>
+                        <p className="text-base leading-4 ">My Calendar</p>
+                    </button>
+                    <button className="flex jusitfy-start items-center space-x-6 w-full  focus:outline-none  focus:text-indigo-400  text-white rounded ">
+                    <i class="fa fa-square-plus"></i>
+
+                        <p className="text-base leading-4 ">Join Calendar Group</p>
+                    </button>
+                </div>
                 <div className="flex flex-col justify-start items-center   px-6 border-b border-gray-600 w-full  ">
                     <button onClick={()=>setMenuValue(0)} className="focus:outline-none focus:text-indigo-400  text-white flex justify-between items-center w-full py-5 space-x-14  ">
                         <p className="text-sm leading-5  uppercase">Calendar Groups</p>
-                        <svg id="icon1" className={`${menu[0] ? '' : 'rotate-180'} transform duration-100`} width={24} height={24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="icon1" className={`${menu[0] ? '' : 'rotate-180'} transform duration-100`} width={20} height={20} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </button>
@@ -30,6 +41,7 @@ export default function Sidebar() {
                             </svg>
                             <p className="text-base leading-4  ">Messages</p>
                         </button>
+                        
                     </div>
                 </div>
                 
