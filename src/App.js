@@ -5,6 +5,9 @@ import "@aws-amplify/ui-react/styles.css";
 import { withAuthenticator, Button, View, Card } from "@aws-amplify/ui-react";
 import { Auth } from "aws-amplify";
 import { useEffect, useState } from "react";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar";
 
 function App({ signOut }) {
   const [userInfo, setUserInfo] = useState();
@@ -26,9 +29,11 @@ function App({ signOut }) {
   }
   return (
     <View className="App">
+      {/* <Header userInfo={userInfo} signOut={signOut} /> */}
+      {/* <Sidebar/> */}
       <Card>
-        <div class="bg-blue-500 w-auto h-16">USER: {userInfo !== undefined ? userInfo.username: ""} Nickname: {userInfo !== undefined ? userInfo.attributes.nickname : ""}</div>
-        <div class="flex flex-row">
+        {/* <div class="bg-blue-500 w-auto h-16">USER: {userInfo !== undefined ? userInfo.username: ""} Nickname: {userInfo !== undefined ? userInfo.attributes.nickname : ""}</div> */}
+        {/* <div class="flex flex-row">
           <h1>Set Nickname:</h1>
           <label
             for="small-input"
@@ -49,10 +54,10 @@ function App({ signOut }) {
           >
             Change Nickname
           </button>
-        </div>
+        </div> */}
         <Calendar />
       </Card>
-      <Button onClick={signOut}>Sign Out</Button>
+      <Footer/>
     </View>
   );
 }

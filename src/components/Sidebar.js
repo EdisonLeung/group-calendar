@@ -33,7 +33,7 @@ export const navData = [
 ];
 export default function Sidenav() {
   return (
-    <div className="sidenavClosed">
+    <div className="sidenavClosed z-10">
       <button className="menuBtn">
         <KeyboardDoubleArrowLeftIcon />
       </button>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { createEvent } from "@testing-library/react";
 import { API, Auth } from "aws-amplify";
 import { listEvents } from "../graphql/queries";
 import {
@@ -15,19 +14,27 @@ import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import Sidenav from "./Sidebar";
+import EventModal from "./EventModal";
 
 const WEEK_DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
 ];
 
-const COLORS = ["#86C6EE", "#C3D888", "#FDD0C7", "#FFDAC1", "#B5EAD7", "#C7CEEA", "#F9AE48"]
+const COLORS = [
+  "#86C6EE",
+  "#C3D888",
+  "#FDD0C7",
+  "#FFDAC1",
+  "#B5EAD7",
+  "#C7CEEA",
+  "#F9AE48",
+];
 function CalendarPage() {
   const [events, setEvents] = useState([]);
 
@@ -38,13 +45,16 @@ function CalendarPage() {
   const [startDateTime, setStartDateTime] = useState(new Date());
   const [endDateTime, setEndDateTime] = useState(new Date());
 
+  const [modalInfo, setModalInfo] = useState(undefined);
+  const [zoom, setZoom] = useState(2.5)
+
   const calendar_name = "Your Schedule";
-  const user_to_color = {}
+  const user_to_color = {};
   function getOtherUserColor(username) {
     if (!(username in user_to_color)) {
-      user_to_color[username] = COLORS[Object.keys(user_to_color).length + 1]
+      user_to_color[username] = COLORS[Object.keys(user_to_color).length + 1];
     }
-    return user_to_color[username]
+    return user_to_color[username];
   }
   function handleRepeatClick(day) {
     let rval = [...repeatDays];
@@ -59,12 +69,15 @@ function CalendarPage() {
   async function organizeEvents(events) {
     const rval = [];
     const user = await Auth.currentUserInfo();
-    
+
     events.map((event) => {
-      const event_title = event.owner + " (" + event.title +")"
-      const event_color = event.owner === user.username ? COLORS[0] : getOtherUserColor(event.owner)
+      const event_title = event.owner + " (" + event.title + ")";
+      const event_color =
+        event.owner === user.username
+          ? COLORS[0]
+          : getOtherUserColor(event.owner);
       if (event.repeat) {
-        console.log(event)
+        // console.log(event)
         rval.push({
           groupId: event.id,
           title: event_title,
@@ -88,6 +101,7 @@ function CalendarPage() {
           end: new Date(event.endTime),
           id: event.id,
           color: event_color,
+          allDay: event.allDay,
         });
       }
     });
@@ -130,6 +144,8 @@ function CalendarPage() {
     <div className="App">
       <h1 className="text-3xl mb-9">{calendar_name}</h1>
       <div class="grid grid-cols-6 gap-4">
+        <div className="z-10 col-span-0">hello</div>
+
         <div class="ml-3 outline flex flex-col">
           <h1 class="text-3xl">Create Event</h1>
           <input
@@ -148,28 +164,37 @@ function CalendarPage() {
                   value={startDateTime}
                   onChange={(newValue) => {
                     setStartDateTime(newValue.$d);
+                    const start = new Date(newValue.$d)
+                    const adjust_end = new Date(new Date(start).setHours(start.getHours() + 1))
+                    setEndDateTime(adjust_end)
                   }}
                 />
               </LocalizationProvider>
             </div>
             <div>
-              <input type="checkbox" id="repeat-checkbox" />
+              <input
+                type="checkbox"
+                id="repeat-checkbox"
+                onClick={() => setAllDay(!allDay)}
+              />
               <label for="repeat-checkbox" class="ml-2 text-sm">
                 All-day
               </label>
             </div>
-            <div class="m-2">
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
-                  renderInput={(props) => <TextField {...props} />}
-                  label="End Date/Time"
-                  value={endDateTime}
-                  onChange={(newValue) => {
-                    setEndDateTime(newValue.$d);
-                  }}
-                />
-              </LocalizationProvider>
-            </div>
+            {!allDay && (
+              <div class="m-2">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} />}
+                    label="End Date/Time"
+                    value={endDateTime}
+                    onChange={(newValue) => {
+                      setEndDateTime(newValue.$d);
+                    }}
+                  />
+                </LocalizationProvider>
+              </div>
+            )}
             <div>
               <input
                 type="checkbox"
@@ -181,8 +206,8 @@ function CalendarPage() {
               </label>
             </div>
             {repeat && (
-              <div class="grid grid-cols-3 gap-1">
-                <h1>Every:</h1>
+              <div class="grid grid-cols-4 gap-1 m-2">
+                {/* <p class="">Every:</p> */}
                 {WEEK_DAYS.map((day) => {
                   return (
                     <div class="grid w-full">
@@ -199,7 +224,7 @@ function CalendarPage() {
                       />
                       <label
                         for={WEEK_DAYS.indexOf(day)}
-                        class="p-1 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        class="p-1 text-gray-500 border-4 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                       >
                         <div class="block">
                           <div class="w-full text-xs font-semibold">{day}</div>
@@ -224,24 +249,40 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div class="col-span-5 h-auto mr-3 outline">
+        <div class="col-span-full h-auto mr-3 outline">
           <FullCalendar
-            aspectRatio={2.5}
+            aspectRatio={zoom}
             handleWindowResize
             initialView="timeGridWeek"
             scrollTime={"08:00:00"}
             headerToolbar={{
               start: "title",
               center: "dayGridMonth,timeGridWeek,timeGridDay",
-              end: "today prev,next",
+              end: "zoomIn zoomOut today prev,next",
+            }}
+            customButtons={{
+              zoomIn: {
+                text: "Shrink Height",
+                click: function () {
+                  setZoom(zoom + 0.5)
+                },
+              },
+              zoomOut: {
+                text: "Increase Height",
+                click: function () {
+                    setZoom(zoom - 0.5)
+                },
+              },
             }}
             plugins={[dayGridPlugin, timeGridPlugin]}
             events={events}
-            eventColor=""
+            eventClick={(e) => {
+              setModalInfo(e.event);
+            }}
           />
         </div>
       </div>
-      <View margin="3rem 0">
+      {/* <View margin="3rem 0">
         {events.map((note) => (
           <Flex
             key={note.id || note.title}
@@ -252,15 +293,20 @@ function CalendarPage() {
             <Text as="strong" fontWeight={700}>
               {note.title}
             </Text>
-            <Text as="span">{note.title}</Text>
             <Button variation="link" onClick={() => deleteEvent(note)}>
               Delete Event
             </Button>
           </Flex>
         ))}
-      </View>
+      </View> */}
+
+      <EventModal
+        open={modalInfo !== undefined}
+        onClose={() => setModalInfo(undefined)}
+        modalInfo={modalInfo}
+        deleteEvent={deleteEvent}
+      />
     </div>
   );
 }
-
 export default CalendarPage;
