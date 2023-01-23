@@ -6,7 +6,6 @@ import React from "react";
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"]
 function EventModal(props) {
-
   function noRecurrDateInfo() {
     const startDate = new Date(props.modalInfo._instance.range.start);
     const endDate = new Date(props.modalInfo._instance.range.end)

@@ -266,7 +266,7 @@ function CalendarPage() {
             headerToolbar={{
               start: !isMobile ? "title" : "",
               center: "dayGridMonth,timeGridWeek,timeGridDay hideWeekend",
-              end: "zoomOut zoomIn today prev,next",
+              end: !isMobile ? "zoomOut zoomIn today prev,next" : "today prev,next",
             }}
             customButtons={{
               zoomIn: {
