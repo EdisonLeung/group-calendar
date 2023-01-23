@@ -16,15 +16,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import EventModal from "./EventModal";
 
-const WEEK_DAYS = [
-  "Sun",
-  "Mon",
-  "Tue",
-  "Wed",
-  "Thu",
-  "Fri",
-  "Sat",
-];
+const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const COLORS = [
   "#86C6EE",
@@ -46,8 +38,8 @@ function CalendarPage() {
   const [endDateTime, setEndDateTime] = useState(new Date());
 
   const [modalInfo, setModalInfo] = useState(undefined);
-  const [zoom, setZoom] = useState(2.5)
-  const [hideWeekend, setHideWeekend] = useState(false)
+  const [zoom, setZoom] = useState(2.5);
+  const [hideWeekend, setHideWeekend] = useState(false);
 
   const calendar_name = "Your Schedule";
   const user_to_color = {};
@@ -145,16 +137,16 @@ function CalendarPage() {
     <div className="App">
       <h1 className="text-3xl mb-9">{calendar_name}</h1>
       <div class="grid grid-cols-6 gap-4">
-        <div class="ml-3 outline rounded flex flex-col">
+        <div class="ml-3 rounded-xl flex flex-col shadow-xl bg-blue-100">
           <h1 class="text-3xl">Create Event</h1>
           <input
             type="text"
-            class="bg-gray-50 outline m-5"
+            class="bg-gray-50 m-5 rounded-lg border border-gray-300"
             placeholder="Event Name"
             required
             onChange={(e) => setTitle(e.target.value)}
           />
-          <div class="outline m-2 flex flex-col">
+          <div class="border-gray-300 m-2 flex flex-col rounded-lg">
             <div class="m-2">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateTimePicker
@@ -163,22 +155,32 @@ function CalendarPage() {
                   value={startDateTime}
                   onChange={(newValue) => {
                     setStartDateTime(newValue.$d);
-                    const start = new Date(newValue.$d)
-                    const adjust_end = new Date(new Date(start).setHours(start.getHours() + 1))
-                    setEndDateTime(adjust_end)
+                    const start = new Date(newValue.$d);
+                    const adjust_end = new Date(
+                      new Date(start).setHours(start.getHours() + 1)
+                    );
+                    setEndDateTime(adjust_end);
                   }}
                 />
               </LocalizationProvider>
             </div>
-            <div>
-              <input
-                type="checkbox"
-                id="repeat-checkbox"
-                onClick={() => setAllDay(!allDay)}
-              />
-              <label for="repeat-checkbox" class="ml-2 text-sm">
-                All-day
-              </label>
+            <div class="flex justify-center m-1">
+              <div class="flex items-center pl-4 border border-gray-200 rounded dark:border-gray-700 w-1/2">
+                <input
+                  id="bordered-checkbox-1"
+                  type="checkbox"
+                  value=""
+                  name="bordered-checkbox"
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                  onClick={() => setAllDay(!allDay)}
+                />
+                <label
+                  for="bordered-checkbox-1"
+                  class="w-full ml-2 text-sm font-medium"
+                >
+                  All Day
+                </label>
+              </div>
             </div>
             {!allDay && (
               <div class="m-2">
@@ -194,15 +196,20 @@ function CalendarPage() {
                 </LocalizationProvider>
               </div>
             )}
-            <div>
-              <input
-                type="checkbox"
-                id="repeat-checkbox"
-                onClick={() => setRepeat(!repeat)}
-              />
-              <label for="repeat-checkbox" class="ml-2 text-sm">
-                Repeat
-              </label>
+            <div class="flex justify-center m-1">
+              <div class="flex items-center pl-4 border border-gray-200 rounded dark:border-gray-700 w-1/2">
+                <input
+                  id="repeat"
+                  type="checkbox"
+                  value=""
+                  name="bordered-checkbox"
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                  onClick={() => setRepeat(!repeat)}
+                />
+                <label for="repeat" class="w-full ml-2 text-sm font-medium">
+                  Repeat
+                </label>
+              </div>
             </div>
             {repeat && (
               <div class="grid grid-cols-4 gap-1 m-2">
@@ -234,10 +241,10 @@ function CalendarPage() {
                 })}
               </div>
             )}
-            <div class="outline">
+            <div class="flex">
               <button
                 type="button"
-                class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center m-2"
+                class="text-gray-800 w-full bg-gradient-to-br from-purple-400 to-blue-300 hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center m-2"
                 onClick={() => {
                   alert("Event Created");
                   createEvent();
@@ -248,7 +255,7 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div class="col-span-5 h-auto mr-3 outline">
+        <div class="col-span-5 h-auto mr-3 outline rounded-xl shadow-xl">
           <FullCalendar
             aspectRatio={zoom}
             handleWindowResize
@@ -264,23 +271,23 @@ function CalendarPage() {
               zoomIn: {
                 text: "Shrink Height",
                 click: function () {
-                  setZoom(zoom + 0.5)
+                  setZoom(zoom + 0.5);
                 },
               },
               zoomOut: {
                 text: "Increase Height",
                 click: function () {
-                    setZoom(zoom - 0.5)
+                  setZoom(zoom - 0.5);
                 },
               },
               hideWeekend: {
                 text: (hideWeekend ? "Show" : "Hide") + " Weekend",
-                click: function() {
-                  setHideWeekend(!hideWeekend)
-                }
-              }
+                click: function () {
+                  setHideWeekend(!hideWeekend);
+                },
+              },
             }}
-            hiddenDays={hideWeekend ? [0,6] : []}
+            hiddenDays={hideWeekend ? [0, 6] : []}
             plugins={[dayGridPlugin, timeGridPlugin]}
             events={events}
             eventClick={(e) => {
