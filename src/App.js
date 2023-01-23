@@ -12,6 +12,8 @@ import Sidebar from "./components/Sidebar";
 function App({ signOut }) {
   const [userInfo, setUserInfo] = useState();
   const [nickname, setNickname] = useState();
+
+  const [showSidebar, setShowSidebar] = useState(false);
   async function fetchUser() {
     const user = await Auth.currentUserInfo();
     setUserInfo(user);
@@ -29,8 +31,8 @@ function App({ signOut }) {
   }
   return (
     <View className="App">
-      {/* <Header userInfo={userInfo} signOut={signOut} /> */}
-      {/* <Sidebar/> */}
+      <Header userInfo={userInfo} signOut={signOut} showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
+      {showSidebar && <Sidebar />}
       <Card>
         {/* <div class="bg-blue-500 w-auto h-16">USER: {userInfo !== undefined ? userInfo.username: ""} Nickname: {userInfo !== undefined ? userInfo.attributes.nickname : ""}</div> */}
         {/* <div class="flex flex-row">
@@ -57,7 +59,7 @@ function App({ signOut }) {
         </div> */}
         <Calendar />
       </Card>
-      <Footer/>
+      <Footer />
     </View>
   );
 }

@@ -14,6 +14,7 @@ function Header(props) {
                   <div className="hidden xl:flex">
                     <button
                       className="flex px-5 items-center py-6 text-sm leading-5 text-gray-700 hover:bg-gray-100 transition duration-150 ease-in-out"
+                      onClick={()=>{props.setShowSidebar(!props.showSidebar)}}
                     >
                       <i class="fa fa-bars fa-xl"></i>
                     </button>

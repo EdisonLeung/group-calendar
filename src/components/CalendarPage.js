@@ -47,6 +47,7 @@ function CalendarPage() {
 
   const [modalInfo, setModalInfo] = useState(undefined);
   const [zoom, setZoom] = useState(2.5)
+  const [hideWeekend, setHideWeekend] = useState(false)
 
   const calendar_name = "Your Schedule";
   const user_to_color = {};
@@ -144,8 +145,6 @@ function CalendarPage() {
     <div className="App">
       <h1 className="text-3xl mb-9">{calendar_name}</h1>
       <div class="grid grid-cols-6 gap-4">
-        <div className="z-10 col-span-0">hello</div>
-
         <div class="ml-3 outline flex flex-col">
           <h1 class="text-3xl">Create Event</h1>
           <input
@@ -249,7 +248,7 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div class="col-span-full h-auto mr-3 outline">
+        <div class="col-span-6 h-auto mr-3 outline">
           <FullCalendar
             aspectRatio={zoom}
             handleWindowResize
@@ -258,7 +257,7 @@ function CalendarPage() {
             headerToolbar={{
               start: "title",
               center: "dayGridMonth,timeGridWeek,timeGridDay",
-              end: "zoomIn zoomOut today prev,next",
+              end: "hideWeekend zoomIn zoomOut today prev,next",
             }}
             customButtons={{
               zoomIn: {
@@ -273,7 +272,14 @@ function CalendarPage() {
                     setZoom(zoom - 0.5)
                 },
               },
+              hideWeekend: {
+                text: (hideWeekend ? "Show" : "Hide") + " Weekend",
+                click: function() {
+                  setHideWeekend(!hideWeekend)
+                }
+              }
             }}
+            hiddenDays={hideWeekend ? [0,6] : []}
             plugins={[dayGridPlugin, timeGridPlugin]}
             events={events}
             eventClick={(e) => {
