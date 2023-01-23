@@ -15,6 +15,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import EventModal from "../Modals/EventModal";
+import { isMobile } from "react-device-detect";
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -137,7 +138,7 @@ function CalendarPage() {
     <div className="App">
       <h1 className="text-3xl mb-9">{calendar_name}</h1>
       <div class="grid grid-cols-6 gap-4">
-        <div class="ml-3 rounded-xl flex flex-col shadow-xl bg-blue-100">
+        <div class={`${isMobile ? "col-span-full" : ""} ml-3 rounded-xl flex flex-col shadow-xl bg-blue-100`}>
           <h1 class="text-3xl">Create Event</h1>
           <input
             type="text"
@@ -255,27 +256,27 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div class="col-span-full h-auto mr-3 border-2 border-sky-500 rounded-xl shadow-xl">
+        <div className={`${isMobile ? "col-span-full" : "col-span-5"} h-auto mr-3 border-2 border-sky-500 rounded-xl shadow-xl`}>
           <FullCalendar
-            aspectRatio={zoom}
+            aspectRatio={!isMobile ? zoom : 0}
             handleWindowResize
             initialView="timeGridWeek"
             scrollTime={"08:00:00"}
             displayEventTime={false}
             headerToolbar={{
-              start: "title",
+              start: !isMobile ? "title" : "",
               center: "dayGridMonth,timeGridWeek,timeGridDay hideWeekend",
               end: "zoomOut zoomIn today prev,next",
             }}
             customButtons={{
               zoomIn: {
-                text: "(-) Height",
+                text: "(-) size",
                 click: function () {
                   setZoom(zoom + 0.5);
                 },
               },
               zoomOut: {
-                text: "(+) Height",
+                text: "(+) size",
                 click: function () {
                   setZoom(zoom - 0.5);
                 },
