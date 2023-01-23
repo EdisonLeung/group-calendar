@@ -248,12 +248,13 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div class="col-span-6 h-auto mr-3 outline">
+        <div class="col-span-5 h-auto mr-3 outline">
           <FullCalendar
             aspectRatio={zoom}
             handleWindowResize
             initialView="timeGridWeek"
             scrollTime={"08:00:00"}
+            displayEventTime={false}
             headerToolbar={{
               start: "title",
               center: "dayGridMonth,timeGridWeek,timeGridDay",

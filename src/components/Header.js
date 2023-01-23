@@ -5,7 +5,7 @@ function Header(props) {
     <>
       <div className="bg-gray-200 h-full w-full mb-5">
         {/* Code block starts */}
-        <nav className="bg-blue-100 shadow xl:block hidden p-2">
+        <div className="bg-blue-100 shadow xl:block hidden p-2">
           <div className="">
             <div className="flex items-center justify-between">
               <div className="flex w-full sm:w-auto items-center sm:items-stretch justify-end sm:justify-start">
@@ -81,21 +81,7 @@ function Header(props) {
                         />
                       </div>
                       <div className="ml-2 text-gray-600">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-chevron-down cursor-pointer"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" />
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
+                        <i class="fa fa-angle-down"></i>
                       </div>
                     </div>
                   </div>
@@ -103,7 +89,7 @@ function Header(props) {
               </div>
             </div>
           </div>
-        </nav>{" "}
+        </div>{" "}
       </div>
     </>
   );
