@@ -50,14 +50,19 @@ function CalendarPage(props) {
       repeat: repeat,
       allDay: allDay,
       daysOfWeek: repeatDays,
-      group: props.eventType === "personal" ? props.userInfo.username : props.eventType.id
+      group:
+        props.eventType === "personal"
+          ? props.userInfo.username
+          : props.eventType.id,
     };
     await API.graphql({
       query: createEventMutation,
       variables: { input: data },
     });
     // console.log(props.eventType)
-    props.fetchEvents(props.eventType === "personal" ? "personal" : props.eventType.id);
+    props.fetchEvents(
+      props.eventType === "personal" ? "personal" : props.eventType.id
+    );
   }
 
   async function deleteEvent({ id }) {
@@ -66,12 +71,15 @@ function CalendarPage(props) {
       variables: { input: { id } },
     });
 
-    props.fetchEvents(props.eventType === "personal" ? "personal" : props.eventType.id);
+    props.fetchEvents(
+      props.eventType === "personal" ? "personal" : props.eventType.id
+    );
   }
 
   useEffect(() => {
-
-    props.fetchEvents(props.eventType === "personal" ? "personal" : props.eventType.id);
+    props.fetchEvents(
+      props.eventType === "personal" ? "personal" : props.eventType.id
+    );
   }, []);
   return (
     <div className="App">
@@ -208,6 +216,20 @@ function CalendarPage(props) {
             isMobile ? "col-span-full" : "col-span-5"
           } h-auto mr-3 border-2 border-sky-500 rounded-xl shadow-xl`}
         >
+          {props.eventType !== "personal" && (
+            <button class="flex justify-start p-1 text-gray-500 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+             onClick={()=> {
+              navigator.clipboard.writeText(
+                props.eventType.id.split("-")[0]
+              );
+              alert("copied to clipboard");
+             }}>
+              Group Code:{" "}
+              {props.eventType.id !== undefined
+                ? props.eventType.id.split("-")[0]
+                : ""}
+            </button>
+          )}
           <FullCalendar
             aspectRatio={!isMobile ? zoom : 0}
             handleWindowResize
@@ -216,8 +238,8 @@ function CalendarPage(props) {
             displayEventTime={false}
             headerToolbar={{
               start:
-                (!isMobile ? "title" : "") +
-                (props.eventType === "personal" ? "" : " groupCode"),
+                (!isMobile ? "title" : ""),
+                // (props.eventType === "personal" ? "" : " groupCode"),
               center: "dayGridMonth,timeGridWeek,timeGridDay hideWeekend",
               end: !isMobile
                 ? "zoomOut zoomIn today prev,next"
@@ -231,8 +253,10 @@ function CalendarPage(props) {
                     ? props.eventType.id.split("-")[0]
                     : ""),
                 click: function () {
-                  navigator.clipboard.writeText(props.eventType.id.split("-")[0])
-                  alert("copied to clipboard")
+                  navigator.clipboard.writeText(
+                    props.eventType.id.split("-")[0]
+                  );
+                  alert("copied to clipboard");
                 },
               },
               zoomIn: {
