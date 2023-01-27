@@ -2,18 +2,39 @@ import logo from "./logo.svg";
 import "./App.css";
 import Calendar from "./components/CalendarPage";
 import "@aws-amplify/ui-react/styles.css";
-import { withAuthenticator, Button, View, Card } from "@aws-amplify/ui-react";
-import { Auth } from "aws-amplify";
+import {
+  withAuthenticator,
+  Button,
+  View,
+  Card,
+  Text,
+  Flex,
+} from "@aws-amplify/ui-react";
+import { API, Auth } from "aws-amplify";
 import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
+import { listEvents } from "./graphql/queries";
+
+const COLORS = [
+  "#86C6EE",
+  "#C3D888",
+  "#FDD0C7",
+  "#FFDAC1",
+  "#B5EAD7",
+  "#C7CEEA",
+  "#F9AE48",
+];
 
 function App({ signOut }) {
   const [userInfo, setUserInfo] = useState();
   const [nickname, setNickname] = useState();
-
+  const [eType, setEType] = useState("personal");
   const [showSidebar, setShowSidebar] = useState(false);
+  const user_to_color = {};
+  const [events, setEvents] = useState([]);
+
   async function fetchUser() {
     const user = await Auth.currentUserInfo();
     setUserInfo(user);
@@ -22,42 +43,100 @@ function App({ signOut }) {
     fetchUser();
   }, []);
 
+  function getOtherUserColor(username) {
+    if (!(username in user_to_color)) {
+      user_to_color[username] = COLORS[Object.keys(user_to_color).length + 1];
+    }
+    return user_to_color[username];
+  }
+
+  async function fetchEvents(eventType) {
+    const user = await Auth.currentUserInfo();
+    // if (eventType === "personal") {
+      const apiData = await API.graphql({ query: listEvents });
+      const eventsFromAPI = apiData.data.listEvents.items.filter(
+        (item) => item.group.includes(eventType === "personal" ? user.username : eventType)
+      );
+      // console.log(eventType)
+      organizeEvents(eventsFromAPI);
+    // } else {
+    //   organizeEvents([])
+    // }
+    // console.log(eventsFromAPI)
+  }
+
+  async function organizeEvents(events) {
+    const rval = [];
+    const user = await Auth.currentUserInfo();
+
+    events.map((event) => {
+      const event_title = event.owner + " (" + event.title + ")";
+      const event_color =
+        event.owner === user.username
+          ? COLORS[0]
+          : getOtherUserColor(event.owner);
+      if (event.repeat) {
+        // console.log(event)
+        rval.push({
+          groupId: event.id,
+          title: event_title,
+          startTime:
+            new Date(event.startTime).getHours() +
+            ":" +
+            new Date(event.startTime).getMinutes(),
+          endTime:
+            new Date(event.endTime).getHours() +
+            ":" +
+            new Date(event.endTime).getMinutes(),
+          startRecur: new Date(),
+          daysOfWeek: event.daysOfWeek,
+          id: event.id,
+          color: event_color,
+        });
+      } else {
+        rval.push({
+          title: event_title,
+          start: new Date(event.startTime),
+          end: new Date(event.endTime),
+          id: event.id,
+          color: event_color,
+          allDay: event.allDay,
+        });
+      }
+    });
+    setEvents(rval);
+  }
   async function updateUsername() {
     const user = await Auth.currentAuthenticatedUser();
     await Auth.updateUserAttributes(user, {
       nickname: nickname,
     });
-    fetchUser();
+    // fetchUser();
   }
   return (
     <View className="App">
-      <Header userInfo={userInfo} signOut={signOut} showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
-      {showSidebar && <Sidebar />}
+      <Header
+        userInfo={userInfo}
+        signOut={signOut}
+        showSidebar={showSidebar}
+        setShowSidebar={setShowSidebar}
+      />
+      {showSidebar && (
+        <Sidebar
+          setShowSidebar={setShowSidebar}
+          userInfo={userInfo}
+          setEventType={setEType}
+          fetchEvents={fetchEvents}
+        />
+      )}
       <Card>
-        {/* <div class="bg-blue-500 w-auto h-16">USER: {userInfo !== undefined ? userInfo.username: ""} Nickname: {userInfo !== undefined ? userInfo.attributes.nickname : ""}</div> */}
-        {/* <div class="flex flex-row">
-          <h1>Set Nickname:</h1>
-          <label
-            for="small-input"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Small input
-          </label>
-          <input
-            type="text"
-            id="small-input"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            onChange={(e)=>{setNickname(e.target.value)}}
-          />
-          <button
-            type="button"
-            class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center m-2"
-            onClick={updateUsername}
-          >
-            Change Nickname
-          </button>
-        </div> */}
-        <Calendar />
+        {/* {eventType} */}
+        <Calendar
+          userInfo={userInfo}
+          events={events}
+          eventType={eType}
+          fetchEvents={fetchEvents}
+        />
       </Card>
       <Footer />
     </View>

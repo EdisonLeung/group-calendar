@@ -3,10 +3,10 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { API, Auth } from "aws-amplify";
-import { listEvents } from "../graphql/queries";
 import {
   createEvent as createEventMutation,
   deleteEvent as deleteEventMutation,
+  updateCalendarGroup as updateCalendarGroupMutation,
 } from "../graphql/mutations";
 import { Button, Flex, Text, View } from "@aws-amplify/ui-react";
 
@@ -19,18 +19,7 @@ import { isMobile } from "react-device-detect";
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const COLORS = [
-  "#86C6EE",
-  "#C3D888",
-  "#FDD0C7",
-  "#FFDAC1",
-  "#B5EAD7",
-  "#C7CEEA",
-  "#F9AE48",
-];
-function CalendarPage() {
-  const [events, setEvents] = useState([]);
-
+function CalendarPage(props) {
   const [repeatDays, setRepeatDays] = useState([]);
   const [allDay, setAllDay] = useState(false);
   const [repeat, setRepeat] = useState(false);
@@ -43,13 +32,6 @@ function CalendarPage() {
   const [hideWeekend, setHideWeekend] = useState(false);
 
   const calendar_name = "Your Schedule";
-  const user_to_color = {};
-  function getOtherUserColor(username) {
-    if (!(username in user_to_color)) {
-      user_to_color[username] = COLORS[Object.keys(user_to_color).length + 1];
-    }
-    return user_to_color[username];
-  }
   function handleRepeatClick(day) {
     let rval = [...repeatDays];
     if (repeatDays.indexOf(day) === -1) {
@@ -60,53 +42,6 @@ function CalendarPage() {
     setRepeatDays(rval);
   }
 
-  async function organizeEvents(events) {
-    const rval = [];
-    const user = await Auth.currentUserInfo();
-
-    events.map((event) => {
-      const event_title = event.owner + " (" + event.title + ")";
-      const event_color =
-        event.owner === user.username
-          ? COLORS[0]
-          : getOtherUserColor(event.owner);
-      if (event.repeat) {
-        // console.log(event)
-        rval.push({
-          groupId: event.id,
-          title: event_title,
-          startTime:
-            new Date(event.startTime).getHours() +
-            ":" +
-            new Date(event.startTime).getMinutes(),
-          endTime:
-            new Date(event.endTime).getHours() +
-            ":" +
-            new Date(event.endTime).getMinutes(),
-          startRecur: new Date(),
-          daysOfWeek: event.daysOfWeek,
-          id: event.id,
-          color: event_color,
-        });
-      } else {
-        rval.push({
-          title: event_title,
-          start: new Date(event.startTime),
-          end: new Date(event.endTime),
-          id: event.id,
-          color: event_color,
-          allDay: event.allDay,
-        });
-      }
-    });
-    setEvents(rval);
-  }
-  async function fetchEvents() {
-    const apiData = await API.graphql({ query: listEvents });
-    const eventsFromAPI = apiData.data.listEvents.items;
-    organizeEvents(eventsFromAPI);
-  }
-
   async function createEvent() {
     const data = {
       title: title,
@@ -115,12 +50,14 @@ function CalendarPage() {
       repeat: repeat,
       allDay: allDay,
       daysOfWeek: repeatDays,
+      group: props.eventType === "personal" ? props.userInfo.username : props.eventType.id
     };
     await API.graphql({
       query: createEventMutation,
       variables: { input: data },
     });
-    fetchEvents();
+    // console.log(props.eventType)
+    props.fetchEvents(props.eventType === "personal" ? "personal" : props.eventType.id);
   }
 
   async function deleteEvent({ id }) {
@@ -128,17 +65,27 @@ function CalendarPage() {
       query: deleteEventMutation,
       variables: { input: { id } },
     });
-    fetchEvents();
+
+    props.fetchEvents(props.eventType === "personal" ? "personal" : props.eventType.id);
   }
 
   useEffect(() => {
-    fetchEvents();
+
+    props.fetchEvents(props.eventType === "personal" ? "personal" : props.eventType.id);
   }, []);
   return (
     <div className="App">
-      <h1 className="text-3xl mb-9">{calendar_name}</h1>
+      <h1 className="text-3xl mb-9">
+        {props.eventType === "personal"
+          ? calendar_name
+          : props.eventType.groupName}
+      </h1>
       <div class="grid grid-cols-6 gap-4">
-        <div class={`${isMobile ? "col-span-full" : ""} ml-3 rounded-xl flex flex-col shadow-xl bg-blue-100`}>
+        <div
+          class={`${
+            isMobile ? "col-span-full" : ""
+          } ml-3 rounded-xl flex flex-col shadow-xl bg-blue-100`}
+        >
           <h1 class="text-3xl">Create Event</h1>
           <input
             type="text"
@@ -256,7 +203,11 @@ function CalendarPage() {
             </div>
           </div>
         </div>
-        <div className={`${isMobile ? "col-span-full" : "col-span-5"} h-auto mr-3 border-2 border-sky-500 rounded-xl shadow-xl`}>
+        <div
+          className={`${
+            isMobile ? "col-span-full" : "col-span-5"
+          } h-auto mr-3 border-2 border-sky-500 rounded-xl shadow-xl`}
+        >
           <FullCalendar
             aspectRatio={!isMobile ? zoom : 0}
             handleWindowResize
@@ -264,11 +215,26 @@ function CalendarPage() {
             scrollTime={"08:00:00"}
             displayEventTime={false}
             headerToolbar={{
-              start: !isMobile ? "title" : "",
+              start:
+                (!isMobile ? "title" : "") +
+                (props.eventType === "personal" ? "" : " groupCode"),
               center: "dayGridMonth,timeGridWeek,timeGridDay hideWeekend",
-              end: !isMobile ? "zoomOut zoomIn today prev,next" : "today prev,next",
+              end: !isMobile
+                ? "zoomOut zoomIn today prev,next"
+                : "today prev,next",
             }}
             customButtons={{
+              groupCode: {
+                text:
+                  "Group Code: " +
+                  (props.eventType.id !== undefined
+                    ? props.eventType.id.split("-")[0]
+                    : ""),
+                click: function () {
+                  navigator.clipboard.writeText(props.eventType.id.split("-")[0])
+                  alert("copied to clipboard")
+                },
+              },
               zoomIn: {
                 text: "(-) size",
                 click: function () {
@@ -290,7 +256,7 @@ function CalendarPage() {
             }}
             hiddenDays={hideWeekend ? [0, 6] : []}
             plugins={[dayGridPlugin, timeGridPlugin]}
-            events={events}
+            events={props.events}
             eventClick={(e) => {
               setModalInfo(e.event);
             }}

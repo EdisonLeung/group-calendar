@@ -1,20 +1,44 @@
 import { Modal } from "@mui/material";
 import { Box } from "@mui/system";
 import { API } from "aws-amplify";
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import { listCalendarGroups } from "../graphql/queries";
+import {
+  createCalendarGroup as createCalendarGroupMutation,
+  deleteCalendarGroup as deleteCalendarGroupMutation,
+} from "../graphql/mutations";
+import { Button, Flex, Text, View } from "@aws-amplify/ui-react";
 function CreateCalendarGroup(props) {
   const [groupName, setGroupName] = useState();
-  
+
+  const [test_groups, setTestGroups] = useState([]);
   async function createGroup() {
-    // const data = {
-    //   title: groupName,
-    // };
-    // await API.graphql({
-    //   query: createEventMutation,
-    //   variables: { input: data },
-    // });
-    // fetchEvents();
+    const data = {
+      groupName: groupName,
+      users: [props.userInfo.username],
+    };
+    await API.graphql({
+      query: createCalendarGroupMutation,
+      variables: { input: data },
+    });
+    fetchGroups();
+  }
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  async function deleteEvent({ id }) {
+    await API.graphql({
+      query: deleteCalendarGroupMutation,
+      variables: { input: { id } },
+    });
+    fetchGroups();
+  }
+  async function fetchGroups() {
+    const apiData = await API.graphql({ query: listCalendarGroups });
+    const eventsFromAPI = apiData.data.listCalendarGroups.items;
+    setTestGroups(eventsFromAPI);
   }
   return (
     <div>
@@ -27,7 +51,7 @@ function CreateCalendarGroup(props) {
         <Box sx={modalStyle}>
           <div class="grid grid-cols-4 gap-1 bg-white rounded-lg m-2">
             <div class="col-span-4 h-auto">
-              {/* <form> */}
+              <form>
               <div class="mb-4">
                 <input
                   type="text"
@@ -59,7 +83,24 @@ function CreateCalendarGroup(props) {
               >
                 Cancel
               </button>
-              {/* </form> */}
+              {/* <View margin="3rem 0">
+        {test_groups.map((note) => (
+          <Flex
+            key={note.id}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text as="strong" fontWeight={700}>
+              {note.groupName}: {note.id}
+            </Text>
+            <Button variation="link" onClick={() => deleteEvent(note)}>
+              Delete Group
+            </Button>
+          </Flex>
+        ))}
+      </View> */}
+              </form>
             </div>
           </div>
         </Box>

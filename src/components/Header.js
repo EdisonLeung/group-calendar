@@ -5,9 +5,9 @@ function Header(props) {
 
   return (
     <>
-      <div className="bg-gray-200 h-full w-full mb-5">
+      <div className="bg-gray-200 h-full w-full">
         {/* Code block starts */}
-        <div className="bg-blue-100 shadow xl:block p-2">
+        <div className={`${props.showSidebar ? "fixed" : ""} w-full bg-blue-100 shadow xl:block p-2`}>
           <div className="">
             <div className="flex items-center justify-between">
               <div className="flex w-full sm:w-auto items-center sm:items-stretch justify-end sm:justify-start">

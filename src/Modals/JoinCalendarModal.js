@@ -1,8 +1,33 @@
 import { Modal } from "@mui/material";
 import { Box } from "@mui/system";
-import React from "react";
+import { API } from "aws-amplify";
+import React, { useState } from "react";
+import { listCalendarGroups } from "../graphql/queries";
 
-function joinCalendarModal(props) {
+import {
+  updateCalendarGroup as updateGroupMutation,
+} from "../graphql/mutations";
+
+function JoinCalendarModal(props) {
+  const [joinCode, setJoinCode] = useState()
+  async function joinCalendarGroup() {
+    
+    const apiData = await API.graphql({ query: listCalendarGroups });
+    const eventsFromAPI = apiData.data.listCalendarGroups.items.filter((item) =>
+      item.id.split("-")[0] === joinCode
+    );
+    if (eventsFromAPI.length === 1) {
+      const data = {
+        id: eventsFromAPI[0].id,
+        users: [...eventsFromAPI[0].users, props.userInfo.username]
+      }
+      await API.graphql({
+        query: updateGroupMutation,
+        variables: { input: data}});
+    }
+    console.log(eventsFromAPI)
+    // setGroups(eventsFromAPI);
+  }
   return (
     <Modal
       open={props.open}
@@ -21,11 +46,13 @@ function joinCalendarModal(props) {
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   placeholder="Group Code (ex: ####)"
                   required
+                  onChange={(e)=>setJoinCode(e.target.value)}
                 />
               </div>
               <button
                 type="submit"
                 class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 mr-2"
+                onClick={joinCalendarGroup}
               >
                 Join
               </button>
@@ -58,4 +85,4 @@ const modalStyle = {
   bgcolor: "#FFF",
   borderRadius: 3,
 };
-export default joinCalendarModal;
+export default JoinCalendarModal;

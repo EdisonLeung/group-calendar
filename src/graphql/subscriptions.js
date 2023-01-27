@@ -14,6 +14,7 @@ export const onCreateEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
@@ -33,6 +34,7 @@ export const onUpdateEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
@@ -52,84 +54,52 @@ export const onDeleteEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const onCreateGroup = /* GraphQL */ `
-  subscription OnCreateGroup(
-    $filter: ModelSubscriptionGroupFilterInput
+export const onCreateCalendarGroup = /* GraphQL */ `
+  subscription OnCreateCalendarGroup(
+    $filter: ModelSubscriptionCalendarGroupFilterInput
     $owner: String
   ) {
-    onCreateGroup(filter: $filter, owner: $owner) {
+    onCreateCalendarGroup(filter: $filter, owner: $owner) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const onUpdateGroup = /* GraphQL */ `
-  subscription OnUpdateGroup(
-    $filter: ModelSubscriptionGroupFilterInput
+export const onUpdateCalendarGroup = /* GraphQL */ `
+  subscription OnUpdateCalendarGroup(
+    $filter: ModelSubscriptionCalendarGroupFilterInput
     $owner: String
   ) {
-    onUpdateGroup(filter: $filter, owner: $owner) {
+    onUpdateCalendarGroup(filter: $filter, owner: $owner) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const onDeleteGroup = /* GraphQL */ `
-  subscription OnDeleteGroup(
-    $filter: ModelSubscriptionGroupFilterInput
+export const onDeleteCalendarGroup = /* GraphQL */ `
+  subscription OnDeleteCalendarGroup(
+    $filter: ModelSubscriptionCalendarGroupFilterInput
     $owner: String
   ) {
-    onDeleteGroup(filter: $filter, owner: $owner) {
+    onDeleteCalendarGroup(filter: $filter, owner: $owner) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner

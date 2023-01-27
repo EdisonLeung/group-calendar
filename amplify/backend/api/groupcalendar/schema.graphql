@@ -6,10 +6,11 @@ type Event @model @auth(rules: [{allow: public, operations: [read]}, {allow: own
   repeat: Boolean
   allDay: Boolean
   daysOfWeek: [Int]
+  group: String
 }
 
-type Group @model @auth(rules: [{allow: public, operations: [read]}, {allow: owner}, {allow: private, operations: [read]}]) {
+type CalendarGroup @model @auth(rules: [{allow: public, operations: [read]}, {allow: owner}, {allow: private}]) {
   id: ID!
-  title: String!
-  events: [Event]
+  groupName: String!
+  users: [String]
 }

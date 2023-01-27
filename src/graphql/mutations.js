@@ -14,6 +14,7 @@ export const createEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
@@ -33,6 +34,7 @@ export const updateEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
@@ -52,84 +54,52 @@ export const deleteEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const createGroup = /* GraphQL */ `
-  mutation CreateGroup(
-    $input: CreateGroupInput!
-    $condition: ModelGroupConditionInput
+export const createCalendarGroup = /* GraphQL */ `
+  mutation CreateCalendarGroup(
+    $input: CreateCalendarGroupInput!
+    $condition: ModelCalendarGroupConditionInput
   ) {
-    createGroup(input: $input, condition: $condition) {
+    createCalendarGroup(input: $input, condition: $condition) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const updateGroup = /* GraphQL */ `
-  mutation UpdateGroup(
-    $input: UpdateGroupInput!
-    $condition: ModelGroupConditionInput
+export const updateCalendarGroup = /* GraphQL */ `
+  mutation UpdateCalendarGroup(
+    $input: UpdateCalendarGroupInput!
+    $condition: ModelCalendarGroupConditionInput
   ) {
-    updateGroup(input: $input, condition: $condition) {
+    updateCalendarGroup(input: $input, condition: $condition) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const deleteGroup = /* GraphQL */ `
-  mutation DeleteGroup(
-    $input: DeleteGroupInput!
-    $condition: ModelGroupConditionInput
+export const deleteCalendarGroup = /* GraphQL */ `
+  mutation DeleteCalendarGroup(
+    $input: DeleteCalendarGroupInput!
+    $condition: ModelCalendarGroupConditionInput
   ) {
-    deleteGroup(input: $input, condition: $condition) {
+    deleteCalendarGroup(input: $input, condition: $condition) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner

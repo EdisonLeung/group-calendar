@@ -11,6 +11,7 @@ export const getEvent = /* GraphQL */ `
       repeat
       allDay
       daysOfWeek
+      group
       createdAt
       updatedAt
       owner
@@ -32,6 +33,7 @@ export const listEvents = /* GraphQL */ `
         repeat
         allDay
         daysOfWeek
+        group
         createdAt
         updatedAt
         owner
@@ -40,51 +42,29 @@ export const listEvents = /* GraphQL */ `
     }
   }
 `;
-export const getGroup = /* GraphQL */ `
-  query GetGroup($id: ID!) {
-    getGroup(id: $id) {
+export const getCalendarGroup = /* GraphQL */ `
+  query GetCalendarGroup($id: ID!) {
+    getCalendarGroup(id: $id) {
       id
-      title
-      events {
-        id
-        title
-        startTime
-        endTime
-        repeat
-        allDay
-        daysOfWeek
-        createdAt
-        updatedAt
-        owner
-      }
+      groupName
+      users
       createdAt
       updatedAt
       owner
     }
   }
 `;
-export const listGroups = /* GraphQL */ `
-  query ListGroups(
-    $filter: ModelGroupFilterInput
+export const listCalendarGroups = /* GraphQL */ `
+  query ListCalendarGroups(
+    $filter: ModelCalendarGroupFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    listGroups(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listCalendarGroups(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        title
-        events {
-          id
-          title
-          startTime
-          endTime
-          repeat
-          allDay
-          daysOfWeek
-          createdAt
-          updatedAt
-          owner
-        }
+        groupName
+        users
         createdAt
         updatedAt
         owner
