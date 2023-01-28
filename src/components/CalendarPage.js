@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
+
 import { API, Auth } from "aws-amplify";
 import {
   createEvent as createEventMutation,
   deleteEvent as deleteEventMutation,
-  updateCalendarGroup as updateCalendarGroupMutation,
 } from "../graphql/mutations";
 import { Button, Flex, Text, View } from "@aws-amplify/ui-react";
 
@@ -83,7 +84,7 @@ function CalendarPage(props) {
   }, []);
   return (
     <div className="App">
-      <h1 className="text-3xl mb-9">
+      <h1 className="text-6xl mb-9 title">
         {props.eventType === "personal"
           ? calendar_name
           : props.eventType.groupName}
@@ -94,7 +95,7 @@ function CalendarPage(props) {
             isMobile ? "col-span-full" : ""
           } ml-3 rounded-xl flex flex-col shadow-xl bg-blue-100`}
         >
-          <h1 class="text-3xl">Create Event</h1>
+          <h1 class="title text-4xl font-medium">Create Event</h1>
           <input
             type="text"
             class="bg-gray-50 m-5 rounded-lg border border-gray-300"
@@ -245,6 +246,7 @@ function CalendarPage(props) {
                 ? "zoomOut zoomIn today prev,next"
                 : "today prev,next",
             }}
+            dateClick={(e)=>{}}
             customButtons={{
               groupCode: {
                 text:
@@ -279,7 +281,7 @@ function CalendarPage(props) {
               },
             }}
             hiddenDays={hideWeekend ? [0, 6] : []}
-            plugins={[dayGridPlugin, timeGridPlugin]}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             events={props.events}
             eventClick={(e) => {
               setModalInfo(e.event);

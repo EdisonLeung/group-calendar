@@ -53,3 +53,7 @@
   cursor: pointer;
   padding-left: 20px;
 }
+
+.title {
+  font-family: 'Vladimir Script';
+}

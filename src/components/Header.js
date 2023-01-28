@@ -41,7 +41,7 @@ function Header(props) {
                     </g>
                   </svg>
                   <h2 className="sm:block text-base text-gray-700 font-bold leading-normal pl-3">
-                    Our Calendly
+                    OurCalendly
                   </h2>
                 </div>
               </div>
